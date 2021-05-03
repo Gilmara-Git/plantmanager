@@ -7,11 +7,11 @@ import { Confirmation } from '../pages/Confirmation'
 import { PlantSave } from '../pages/PlantSave';
 
 
+const stackRoutes = createStackNavigator();
 import AuthRoutes from './tab.routes';
 
-
 import colors from '../styles/colors';
-const stackRoutes = createStackNavigator();
+
 
 const AppRoutes: React.FC = () => (
     <stackRoutes.Navigator

@@ -51,6 +51,7 @@ export function UserIdentification(){
 
         try{
             await AsyncStorage.setItem('@plantmanager:user', name);
+            
             navigation.navigate('Confirmation', { 
                 title: 'Prontinho',
                 subtitle: 'Agora vamos começar a regar suas plantinhas com muito cuidado.',

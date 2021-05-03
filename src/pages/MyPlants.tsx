@@ -4,12 +4,13 @@ import {
     Text,
     StyleSheet,
     Image,
-    FlatList
+    FlatList, 
+    ScrollView,
+    Alert
     
 } from 'react-native';
 
 import waterdrop  from '../assets/waterdrop.png';
-import { IPlantProps, loadPlant } from '../libs/storage';
 import colors from '../styles/colors'
 import fonts from '../styles/fonts'
 
@@ -18,11 +19,46 @@ import { pt } from 'date-fns/locale';
 
 import { Header } from '../components/Header'
 import { PlantCardSecondary } from '../components/PlantCardSecondary'
+import { Load } from '../components/Load';
+
+import { IPlantProps, removePlant, loadPlant } from '../libs/storage';
 
 export function MyPlants(){
     const [ myPlants, setMyPlants ] = useState<IPlantProps[]>([]);
     const [loading, setLoading ] = useState(true);
     const [nextWatered, setNextWatered ] = useState<string>(); // nome da planta
+
+    function handleRemove(plant: IPlantProps ){
+        
+        Alert.alert('Remover', `Deseja remover a ${plant.name}?`, [
+                {
+                    text: 'Não 🙏',
+                    style: 'cancel'
+                },
+
+                { 
+                    text: 'Sim 😪 ',
+                    onPress: async () => {
+
+                        try{
+
+
+                               await removePlant(plant.id); // isso esta removendo do storage
+
+                               setMyPlants((oldData) => 
+
+                                oldData.filter((item)=> item.id !== plant.id)
+                               );
+
+                        }catch(error){
+
+                            Alert.alert('Não foi possível remover sua planta! 🙄')
+                        }
+                    } 
+                
+                }
+        ])      
+    }
 
     
     
@@ -30,7 +66,7 @@ export function MyPlants(){
 
         async function loadStorageData(){
             const plantsStoraged = await loadPlant();
-            console.log('PlantStorage posicao 0', plantsStoraged[0])
+            // console.log('PlantStorage posicao 0', plantsStoraged[0])
             
             //calcula qual a distancia de uma data para a outra
             const nextTime = formatDistance(
@@ -39,7 +75,7 @@ export function MyPlants(){
                 { locale: pt }
               
         );  
-        console.log('nextTime baMyPlants', nextTime)
+        // console.log('nextTime baMyPlants', nextTime)
         
             setNextWatered(
                     `Não esqueça de regar a ${plantsStoraged[0].name} a ${nextTime} horas.`
@@ -50,49 +86,61 @@ export function MyPlants(){
     
     };
 
-        loadStorageData();
+        loadStorageData();  
 
     }, [])
 
     
+    if(loading) 
+    return <Load />
+
     return (
-        <View style={styles.container}>
-            <Header />
+        //Isso eu coloquei por minha conta
+        // <ScrollView
+        // showsVerticalScrollIndicator={false}
+      
+        // >
+            <View style={styles.container}>
+                <Header />
 
-            <View style={styles.spotlight}>
-                <Image 
-                source={waterdrop}
-                style={styles.spotlightImage}
-                />
-                <Text style={styles.spotlightText}>
-                    {nextWatered}
-                </Text>
-
-            </View>
-
-
-            <View style={styles.plants}>
-                <Text style={styles.plantsTitle}>
-                    Próximas regadas
-                </Text>
-
-                <FlatList
-                    data={myPlants}
-                    keyExtractor={(item)=> String(item.id)}
-                    renderItem={({ item }) =>(
-                        <PlantCardSecondary
-                        data={item}
-                        
-                        third/>
-                    )}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={ { flex: 1 }}
-
+                <View style={styles.spotlight}>
+                    <Image 
+                    source={waterdrop}
+                    style={styles.spotlightImage}
                     />
+                    <Text style={styles.spotlightText}>
+                        {nextWatered}
+                    </Text>
+
+                </View>
+
+
+                <View style={styles.plants}>
+                    <Text style={styles.plantsTitle}>
+                        Próximas regadas
+                    </Text>
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <FlatList
+                            data={myPlants}
+                            keyExtractor={(item)=> String(item.id)}
+                            renderItem={({ item }) =>(
+                                <PlantCardSecondary
+                                    data={item}
+                                    handleRemove={()=> { handleRemove(item)}}
+                                />
+                            )}
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={ { flex: 1 }}
+
+                        />
+                    </ScrollView>
+
+                </View>
 
             </View>
-
-        </View>
+        // </ScrollView>
 
     )
 }

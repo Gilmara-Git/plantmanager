@@ -2,14 +2,18 @@ import React from 'react';
 import {
     StyleSheet,
     Text, 
-    View
+    View, 
+    Animated
 } from 'react-native';
 
 import {RectButton, RectButtonProps } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
 import { SvgFromUri }  from 'react-native-svg';
 
+import { Feather }  from '@expo/vector-icons';
 
 interface IPlantProps extends RectButtonProps {
     data: {
@@ -17,46 +21,67 @@ interface IPlantProps extends RectButtonProps {
         name: string;
         photo: string;
         hour: string;
-    }
+    },
+    handleRemove: () => void;
     
 }
 
 
 // aqui em vez de exportar a fucnao direto, o Rodrigo colocou em uma variavel
 
-export const PlantCardSecondary = ({ data , ...rest } : IPlantProps) => {
+export const PlantCardSecondary = ({ data , handleRemove, ...rest } : IPlantProps) => {
 
     return(
+        <Swipeable
+            overshootRight={false}
+            renderRightActions={() => (
+                <Animated.View>
+                    <View>
+                        <RectButton
+                            style={styles.buttonRemove}
+                            onPress={handleRemove}
+                        >
+                            <Feather
+                                name='trash'
+                                size={32}
+                                color={colors.white}
+                                
+                            />
 
-        <RectButton 
-            style={styles.container}
-            {...rest}
+                        </RectButton>
+                    </View>
+                </Animated.View>
+            )}
         >
-          
-          <SvgFromUri 
-            uri={data.photo} 
-            width={50} 
-            height={50} 
-          />
+            <RectButton 
+                style={styles.container}
+                {...rest}
+            >
+            
+            <SvgFromUri 
+                uri={data.photo} 
+                width={50} 
+                height={50} 
+            />
 
-            <Text style={styles.title}>
-                { data.name }
-            </Text>
-
-            <View style={styles.details}>
-
-                <Text style={styles.timeLabel}>
-                    Regar `as 
-                </Text>
-                
-                <Text style={styles.time}>
-                    { data.hour }
+                <Text style={styles.title}>
+                    { data.name }
                 </Text>
 
-            </View>
+                <View style={styles.details}>
 
-        </RectButton>
+                    <Text style={styles.timeLabel}>
+                        Regar `as 
+                    </Text>
+                    
+                    <Text style={styles.time}>
+                        { data.hour }
+                    </Text>
 
+                </View>
+
+            </RectButton>
+        </Swipeable>
     );
 }
 
@@ -95,6 +120,19 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: fonts.heading,
         color: colors.body_dark
+    },
+    buttonRemove:{
+        width: 100,
+        height:85,
+        backgroundColor: colors.red,
+        marginTop:15,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        right: 15,
+        paddingLeft: 10
+
     }
 
 });
