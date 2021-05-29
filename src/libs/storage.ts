@@ -120,7 +120,7 @@ export async function loadPlant() : Promise<IPlantProps[]> {
             )
         );
         // console.log('PlantsSorted no arquivo storage',plantsSorted)
-        return plantsSorted;
+        return plantsSorted; // organizada na data mais proxima
         
     }catch(error){
         throw new Error(error);
